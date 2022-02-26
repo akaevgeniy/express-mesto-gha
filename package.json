@@ -1,0 +1,31 @@
+{
+  "name": "express-mesto",
+  "version": "1.0.0",
+  "description": "Mesto backend",
+  "main": "app.js",
+  "scripts": {
+    "lint": "npx eslint",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akaevgeniy/express-mesto.git"
+  },
+  "author": "Evgeniy Sergeev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akaevgeniy/express-mesto/issues"
+  },
+  "homepage": "https://github.com/akaevgeniy/express-mesto#readme",
+  "devDependencies": {
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "express": "^4.17.3",
+    "mongoose": "^6.2.2"
+  }
+}
