@@ -25,14 +25,17 @@ module.exports.getUserId = (req, res) => {
         },
       })
     )
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
-      } else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемый пользователь не найден",
-        });
-      else return parseError();
+      } else return parseError();
     });
 };
 ////контроллер для создания нового пользоватля, в тело передаются три параметра
@@ -78,14 +81,17 @@ module.exports.updateUser = (req, res) => {
         },
       })
     )
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
-        });
-      else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемый пользователь не найден",
         });
       else return parseError();
     });
@@ -111,14 +117,17 @@ module.exports.updateAvatar = (req, res) => {
         },
       })
     )
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
-        });
-      else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемый пользователь не найден",
         });
       else return parseError();
     });

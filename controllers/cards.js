@@ -31,14 +31,15 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => res.send({ message: "Пост был удален" }))
+    .orFail(() => {
+      const error = new Error("Карточка по заданному id отсутствует в базе");
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
-      } else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемая карточка не найдена",
-        });
-      else return parseError();
+      } else return parseError();
     });
 };
 //постановка лайка карточке
@@ -50,14 +51,15 @@ module.exports.likeCard = (req, res) => {
   )
     .populate(["owner", "likes"])
     .then((card) => res.send({ data: card }))
+    .orFail(() => {
+      const error = new Error("Карточка по заданному id отсутствует в базе");
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "CastError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
-        });
-      else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемая карточка не найдена",
         });
       else return parseError();
     });
@@ -71,14 +73,15 @@ module.exports.dislikeCard = (req, res) => {
   )
     .populate(["owner", "likes"])
     .then((card) => res.send({ data: card }))
+    .orFail(() => {
+      const error = new Error("Карточка по заданному id отсутствует в базе");
+      error.name = "NotFound";
+      throw error;
+    })
     .catch((err) => {
       if (err.name === "CastError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
-        });
-      else if (err.name === "NotFound")
-        return res.status(ERROR_NOT_CODE).send({
-          message: "Запрашиваемая карточка не найдена",
         });
       else return parseError();
     });
