@@ -15,6 +15,13 @@ module.exports.getUsers = (req, res) => {
 //контроллер для получения конкретного пользователя по ид
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .then((user) =>
       res.send({
         data: {
@@ -25,20 +32,15 @@ module.exports.getUserId = (req, res) => {
         },
       })
     )
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
     .catch((err) => {
       if (err.name === "CastError") {
         res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      } else if (err.name === "NotFound") {
+        return res.status(ERROR_NOT_CODE).send({ message: err.message });
       } else return parseError();
     });
 };
-////контроллер для создания нового пользоватля, в тело передаются три параметра
+//контроллер для создания нового пользоватля, в тело передаются три параметра
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
@@ -71,6 +73,13 @@ module.exports.updateUser = (req, res) => {
       runValidators: true, // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
     }
   )
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .then((user) =>
       res.send({
         data: {
@@ -81,19 +90,14 @@ module.exports.updateUser = (req, res) => {
         },
       })
     )
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
     .catch((err) => {
-      if (err.name === "ValidationError")
+      if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      else return parseError();
+      } else if (err.name === "NotFound") {
+        return res.status(ERROR_NOT_CODE).send({ message: err.message });
+      } else return parseError();
     });
 };
 //обновление аватара пользователя
@@ -107,6 +111,13 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     }
   )
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
     .then((user) =>
       res.send({
         data: {
@@ -117,18 +128,13 @@ module.exports.updateAvatar = (req, res) => {
         },
       })
     )
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
     .catch((err) => {
-      if (err.name === "ValidationError")
+      if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      else return parseError();
+      } else if (err.name === "NotFound") {
+        return res.status(ERROR_NOT_CODE).send({ message: err.message });
+      } else return parseError();
     });
 };
