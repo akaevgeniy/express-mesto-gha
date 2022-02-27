@@ -3,7 +3,7 @@ const ERROR_CODE = 500;
 const ERROR_NOT_CODE = 404;
 const ERROR_BAD_CODE = 400;
 //функция, обрабатывающая ошибку сервера по умолчанию
-const parseError = (err) => {
+const parseError = (res) => {
   res.status(ERROR_CODE).send({ message: "Произошла ошибка сервера" });
 };
 //контроллер получения всех карточек
@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
@@ -32,7 +32,9 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => res.send({ message: "Пост был удален" }))
     .catch((err) => {
-      if (err.name === "NotFound")
+      if (err.name === "CastError") {
+        res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      } else if (err.name === "NotFound")
         return res.status(ERROR_NOT_CODE).send({
           message: "Запрашиваемая карточка не найдена",
         });
@@ -49,7 +51,7 @@ module.exports.likeCard = (req, res) => {
     .populate(["owner", "likes"])
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "CastError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
@@ -70,7 +72,7 @@ module.exports.dislikeCard = (req, res) => {
     .populate(["owner", "likes"])
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "CastError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });

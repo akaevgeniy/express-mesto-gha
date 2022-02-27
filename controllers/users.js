@@ -3,7 +3,7 @@ const ERROR_CODE = 500;
 const ERROR_NOT_CODE = 404;
 const ERROR_BAD_CODE = 400;
 //функция, обрабатывающая ошибку сервера по умолчанию
-const parseError = (err) => {
+const parseError = (res) => {
   res.status(ERROR_CODE).send({ message: "Произошла ошибка сервера" });
 };
 //контроллер для получения всех пользоватлей
@@ -26,7 +26,9 @@ module.exports.getUserId = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.name === "NotFound")
+      if (err.name === "CastError") {
+        res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      } else if (err.name === "NotFound")
         return res.status(ERROR_NOT_CODE).send({
           message: "Запрашиваемый пользователь не найден",
         });
@@ -48,7 +50,7 @@ module.exports.createUser = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
@@ -62,7 +64,8 @@ module.exports.updateUser = (req, res) => {
     req.user._id,
     { name, about },
     {
-      new: true, // обработчик then получит на вход обновлённую запись
+      new: true,
+      runValidators: true, // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
     }
   )
     .then((user) =>
@@ -76,7 +79,7 @@ module.exports.updateUser = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
@@ -95,6 +98,7 @@ module.exports.updateAvatar = (req, res) => {
     { avatar },
     {
       new: true,
+      runValidators: true,
     }
   )
     .then((user) =>
@@ -108,7 +112,7 @@ module.exports.updateAvatar = (req, res) => {
       })
     )
     .catch((err) => {
-      if (err.name === "BadRequest")
+      if (err.name === "ValidationError")
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
