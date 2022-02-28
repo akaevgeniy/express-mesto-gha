@@ -1,18 +1,19 @@
 const User = require("../models/user");
+
 const ERROR_CODE = 500;
 const ERROR_NOT_CODE = 404;
 const ERROR_BAD_CODE = 400;
-//функция, обрабатывающая ошибку сервера по умолчанию
+// функция, обрабатывающая ошибку сервера по умолчанию
 const parseError = (res) => {
   res.status(ERROR_CODE).send({ message: "Произошла ошибка сервера" });
 };
-//контроллер для получения всех пользоватлей
+// контроллер для получения всех пользоватлей
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(parseError);
 };
-//контроллер для получения конкретного пользователя по ид
+// контроллер для получения конкретного пользователя по ид
 module.exports.getUserId = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
@@ -22,7 +23,7 @@ module.exports.getUserId = (req, res) => {
       error.name = "NotFound";
       throw error;
     })
-    .then((user) =>
+    .then((user) => {
       res.send({
         data: {
           name: user.name,
@@ -30,21 +31,23 @@ module.exports.getUserId = (req, res) => {
           avatar: user.avatar,
           _id: user._id,
         },
-      })
-    )
+      });
+    })
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
-      } else if (err.name === "NotFound") {
+        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };
-//контроллер для создания нового пользоватля, в тело передаются три параметра
+// контроллер для создания нового пользоватля, в тело передаются три параметра
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) =>
+    .then((user) => {
       res.send({
         data: {
           name: user.name,
@@ -52,17 +55,18 @@ module.exports.createUser = (req, res) => {
           avatar: user.avatar,
           _id: user._id,
         },
-      })
-    )
+      });
+    })
     .catch((err) => {
-      if (err.name === "ValidationError")
+      if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      else return parseError();
+      }
+      return parseError();
     });
 };
-//обновление инфы о пользователе (имя и о себе)
+// обновление инфы о пользователе (имя и о себе)
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
@@ -70,7 +74,8 @@ module.exports.updateUser = (req, res) => {
     { name, about },
     {
       new: true,
-      runValidators: true, // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
+      runValidators: true,
+      // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
     }
   )
     .orFail(() => {
@@ -80,7 +85,7 @@ module.exports.updateUser = (req, res) => {
       error.name = "NotFound";
       throw error;
     })
-    .then((user) =>
+    .then((user) => {
       res.send({
         data: {
           name: user.name,
@@ -88,19 +93,21 @@ module.exports.updateUser = (req, res) => {
           avatar: user.avatar,
           _id: user._id,
         },
-      })
-    )
+      });
+    })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };
-//обновление аватара пользователя
+// обновление аватара пользователя
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
@@ -118,7 +125,7 @@ module.exports.updateAvatar = (req, res) => {
       error.name = "NotFound";
       throw error;
     })
-    .then((user) =>
+    .then((user) => {
       res.send({
         data: {
           name: user.name,
@@ -126,15 +133,17 @@ module.exports.updateAvatar = (req, res) => {
           avatar: user.avatar,
           _id: user._id,
         },
-      })
-    )
+      });
+    })
     .catch((err) => {
       if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };

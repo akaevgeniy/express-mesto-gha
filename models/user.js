@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-//схема пользователя, состоит из трех обязательных полей
+// схема пользователя, состоит из трех обязательных полей
 const userSchema = new mongoose.Schema({
   name: {
     type: String,

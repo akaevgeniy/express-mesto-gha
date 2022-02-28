@@ -1,33 +1,35 @@
 const Card = require("../models/card");
+
 const ERROR_CODE = 500;
 const ERROR_NOT_CODE = 404;
 const ERROR_BAD_CODE = 400;
-//функция, обрабатывающая ошибку сервера по умолчанию
+// функция, обрабатывающая ошибку сервера по умолчанию
 const parseError = (res) => {
   res.status(ERROR_CODE).send({ message: "Произошла ошибка сервера" });
 };
-//контроллер получения всех карточек
+// контроллер получения всех карточек
 module.exports.getCards = (req, res) => {
   Card.find({})
     .populate(["owner", "likes"])
     .then((cards) => res.send({ data: cards }))
     .catch(parseError);
 };
-//создание новой карточки
+// создание новой карточки
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidationError")
+      if (err.name === "ValidationError") {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      else return parseError();
+      }
+      return parseError();
     });
 };
-//удаление карточки по ид
+// удаление карточки по ид
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
@@ -35,16 +37,18 @@ module.exports.deleteCard = (req, res) => {
       error.name = "NotFound";
       throw error;
     })
-    .then((card) => res.send({ message: "Пост был удален" }))
+    .then(() => res.send({ message: "Пост был удален" }))
     .catch((err) => {
       if (err.name === "CastError") {
-        res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
-      } else if (err.name === "NotFound") {
+        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };
-//постановка лайка карточке
+// постановка лайка карточке
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
@@ -63,12 +67,14 @@ module.exports.likeCard = (req, res) => {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };
-//снятие лайка (дизлайк) с карточки
+// снятие лайка (дизлайк) с карточки
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
@@ -87,8 +93,10 @@ module.exports.dislikeCard = (req, res) => {
         return res.status(ERROR_BAD_CODE).send({
           message: "Переданы некорректные данные",
         });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      } else return parseError();
+      }
+      return parseError();
     });
 };

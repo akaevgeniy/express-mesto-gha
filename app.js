@@ -7,7 +7,7 @@ const cardsRouter = require("./routes/cards");
 const { PORT = 3000 } = process.env;
 
 const app = express();
-//middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
+// middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
 app.use((req, res, next) => {
   req.user = {
     _id: "6217840c8fcbe148c884c157",
@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-//соединяемся с БД на локальном порту
+// соединяемся с БД на локальном порту
 mongoose.connect("mongodb://localhost:27017/mestodb", (err) => {
   if (err) throw err;
   console.log("connected to MongoDB");
@@ -25,7 +25,7 @@ mongoose.connect("mongodb://localhost:27017/mestodb", (err) => {
 
 app.use(userRouter);
 app.use(cardsRouter);
-//запуск сервера, слушаем порт
+// запуск сервера, слушаем порт
 app.listen(PORT, () => {
   console.log("Run server...", PORT);
 });
