@@ -10,7 +10,7 @@ const app = express();
 // middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
 app.use((req, res, next) => {
   req.user = {
-    _id: "6217840c8fcbe148c884c157",
+    _id: "622253bec6d7adf2d66aa69a",
   };
 
   next();
