@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const auth = require("./middlewares/auth");
 const userRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
 const {
@@ -24,6 +25,7 @@ app.post("/signup", createUser);
 
 //   next();
 // });
+app.use(auth);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // соединяемся с БД на локальном порту
