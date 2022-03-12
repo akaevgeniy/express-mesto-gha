@@ -3,18 +3,27 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const userRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
+const {
+  createUser,
+  login
+} = require("./controllers/users");
+
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
-// middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
-app.use((req, res, next) => {
-  req.user = {
-    _id: "622253bec6d7adf2d66aa69a",
-  };
 
-  next();
-});
+app.post("/signin", login);
+
+app.post("/signup", createUser);
+// middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: "622253bec6d7adf2d66aa69a",
+//   };
+
+//   next();
+// });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // соединяемся с БД на локальном порту

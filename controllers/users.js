@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const ERROR_CODE = 500;
@@ -155,5 +156,23 @@ module.exports.updateAvatar = (req, res) => {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
       }
       return parseError();
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // создадим токен
+      const token = jwt.sign({ _id: user._id }, "some-secret-key", { expiresIn: "7d" });
+
+      // вернём токен
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
     });
 };
