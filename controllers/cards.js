@@ -38,7 +38,14 @@ module.exports.deleteCard = (req, res) => {
       throw error;
     })
 
-    .then(() => res.send({ message: "Пост был удален" }))
+    .then((card) => {
+      if (req.user._id !== card.owner.toString()) {
+        return Promise.reject(new Error("Нет доступа"));
+      }
+
+      return Card.findByIdAndRemove(req.params.cardId)
+        .then(() => res.send({ message: "Пост был удален" }));
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
