@@ -48,13 +48,13 @@ module.exports.getUserId = (req, res) => {
 // контроллер для создания нового пользоватля, в тело передаются три параметра
 module.exports.createUser = (req, res) => {
   const {
-    name, about, avatar, email, password
+    email, password
   } = req.body;
 
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, password: hash
+      email, password: hash
     }))
     .then((user) => {
       res.send({
@@ -162,7 +162,6 @@ module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    .select("+password")
     .then((user) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, "some-secret-key", { expiresIn: "7d" });

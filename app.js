@@ -13,10 +13,10 @@ const {
 const { PORT = 3000 } = process.env;
 
 const app = express();
+app.use(express.json());
+app.post("/signup", createUser);
 
 app.post("/signin", login);
-
-app.post("/signup", createUser);
 // middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
 // app.use((req, res, next) => {
 //   req.user = {

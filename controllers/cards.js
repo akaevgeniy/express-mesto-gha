@@ -31,12 +31,13 @@ module.exports.createCard = (req, res) => {
 };
 // удаление карточки по ид
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => {
       const error = new Error("Карточка по заданному id отсутствует в базе");
       error.name = "NotFound";
       throw error;
     })
+
     .then(() => res.send({ message: "Пост был удален" }))
     .catch((err) => {
       if (err.name === "CastError") {
