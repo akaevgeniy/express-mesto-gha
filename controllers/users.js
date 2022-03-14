@@ -198,7 +198,7 @@ module.exports.getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id" });
       }
       if (err.name === "NotFound") {
         return res.status(ERROR_NOT_CODE).send({ message: err.message });
