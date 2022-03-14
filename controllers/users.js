@@ -176,3 +176,33 @@ module.exports.login = (req, res) => {
         .send({ message: err.message });
     });
 };
+// контроллер для получения данных о текущем пользователе
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .orFail(() => {
+      const error = new Error(
+        "Пользователь по заданному id отсутствует в базе"
+      );
+      error.name = "NotFound";
+      throw error;
+    })
+    .then((user) => {
+      res.send({
+        data: {
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          _id: user._id,
+        },
+      });
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+      }
+      if (err.name === "NotFound") {
+        return res.status(ERROR_NOT_CODE).send({ message: err.message });
+      }
+      return parseError();
+    });
+};
