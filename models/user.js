@@ -2,6 +2,7 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 // схема пользователя, состоит из трех обязательных полей
+// /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
