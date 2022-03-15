@@ -1,6 +1,7 @@
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
+const Unauthorized = require("../errors/unauth");
 // схема пользователя, состоит из трех обязательных полей
 // /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
 const userSchema = new mongoose.Schema({
@@ -40,13 +41,13 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .select("+password")
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error("Неправильные почта или пароль"));
+        throw new Unauthorized("Неправильные почта или пароль");
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error("Неправильные почта или пароль"));
+            throw new Unauthorized("Неправильные почта или пароль");
           }
 
           return user; // теперь user доступен

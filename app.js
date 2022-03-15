@@ -18,14 +18,7 @@ app.use(express.json());
 app.post("/signup", createUser);
 
 app.post("/signin", login);
-// middleware, назначающий каждому вызову в запрос захардкоденный ид пользователя
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: "622253bec6d7adf2d66aa69a",
-//   };
 
-//   next();
-// });
 app.use(auth);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

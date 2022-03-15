@@ -1,30 +1,20 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const NotFoundError = require("../errors/not-found-err");
+const BadRequestError = require("../errors/bad-req-err");
+const ConflictError = require("../errors/conflict-err");
 
-const ERROR_CODE = 500;
-const ERROR_NOT_CODE = 404;
-const ERROR_BAD_CODE = 400;
-// функция, обрабатывающая ошибку сервера по умолчанию
-const parseError = (res) => {
-  res.status(ERROR_CODE).send({ message: "Произошла ошибка сервера" });
-};
 // контроллер для получения всех пользоватлей
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(parseError);
+    .catch(next);
 };
 // контроллер для получения конкретного пользователя по ид
-module.exports.getUserId = (req, res) => {
+module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
+    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
     .then((user) => {
       res.send({
         data: {
@@ -37,16 +27,14 @@ module.exports.getUserId = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id " });
+        throw new BadRequestError("Невалидный id ");
       }
-      if (err.name === "NotFound") {
-        return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      }
-      return parseError();
-    });
+      next(err);
+    })
+    .catch(next);
 };
 // контроллер для создания нового пользоватля, в тело передаются три параметра
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     email, password
   } = req.body;
@@ -69,15 +57,17 @@ module.exports.createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(ERROR_BAD_CODE).send({
-          message: "Переданы некорректные данные",
-        });
+        throw new BadRequestError("Переданы некорректные данные");
       }
-      return parseError();
-    });
+      if (err.name === "MongoError" && err.code === 11000) {
+        throw new ConflictError("Пользователь с данным email уже существует!");
+      }
+      next(err);
+    })
+    .catch(next);
 };
 // обновление инфы о пользователе (имя и о себе)
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -88,13 +78,7 @@ module.exports.updateUser = (req, res) => {
       // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
     }
   )
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
+    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
     .then((user) => {
       res.send({
         data: {
@@ -107,18 +91,14 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(ERROR_BAD_CODE).send({
-          message: "Переданы некорректные данные",
-        });
+        throw new BadRequestError("Переданы некорректные данные");
       }
-      if (err.name === "NotFound") {
-        return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      }
-      return parseError();
-    });
+      next(err);
+    })
+    .catch(next);
 };
 // обновление аватара пользователя
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -128,13 +108,7 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     }
   )
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
+    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
     .then((user) => {
       res.send({
         data: {
@@ -147,15 +121,11 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        return res.status(ERROR_BAD_CODE).send({
-          message: "Переданы некорректные данные",
-        });
+        throw new BadRequestError("Переданы некорректные данные");
       }
-      if (err.name === "NotFound") {
-        return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      }
-      return parseError();
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
 module.exports.login = (req, res) => {
@@ -176,15 +146,9 @@ module.exports.login = (req, res) => {
     });
 };
 // контроллер для получения данных о текущем пользователе
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(() => {
-      const error = new Error(
-        "Пользователь по заданному id отсутствует в базе"
-      );
-      error.name = "NotFound";
-      throw error;
-    })
+    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
     .then((user) => {
       res.send({
         data: {
@@ -198,11 +162,9 @@ module.exports.getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res.status(ERROR_BAD_CODE).send({ message: "Невалидный id" });
+        throw new BadRequestError("Невалидный id");
       }
-      if (err.name === "NotFound") {
-        return res.status(ERROR_NOT_CODE).send({ message: err.message });
-      }
-      return parseError();
-    });
+      next(err);
+    })
+    .catch(next);
 };
