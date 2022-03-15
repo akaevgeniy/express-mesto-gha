@@ -1,10 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const { errors } = require("celebrate");
 const auth = require("./middlewares/auth");
 const userRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
-const errors = require("./middlewares/errors");
+const errorsMiddleware = require("./middlewares/errors");
 const {
   createUser,
   login
@@ -35,7 +36,8 @@ app.use((req, res, next) => {
   res.status(404).send({ message: "Ошибка 404 - Неправильный путь" });
   next();
 });
-app.use(errors);
+app.use(errors());
+app.use(errorsMiddleware);
 // запуск сервера, слушаем порт
 app.listen(PORT, () => {
   console.log("Run server...", PORT);
