@@ -1,16 +1,6 @@
 {
   "extends": "airbnb-base",
   "rules": {
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-    "linebreak-style": 0,
-    "quotes": [2, "double"],
-    "comma-dangle": [
-      "error",
-      {
-        "arrays": "ignore",
-        "objects": "ignore",
-        "functions": "never"
-      }
-    ]
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   }
 }

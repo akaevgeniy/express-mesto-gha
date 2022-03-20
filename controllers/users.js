@@ -1,9 +1,9 @@
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const NotFoundError = require("../errors/not-found-err");
-const BadRequestError = require("../errors/bad-req-err");
-const ConflictError = require("../errors/conflict-err");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/bad-req-err');
+const ConflictError = require('../errors/conflict-err');
 
 // контроллер для получения всех пользоватлей
 module.exports.getUsers = (req, res, next) => {
@@ -14,7 +14,7 @@ module.exports.getUsers = (req, res, next) => {
 // контроллер для получения конкретного пользователя по ид
 module.exports.getUserId = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
+    .orFail(new NotFoundError('Пользователь по заданному id отсутствует в базе'))
     .then((user) => {
       res.send({
         data: {
@@ -26,8 +26,8 @@ module.exports.getUserId = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        throw new BadRequestError("Невалидный id ");
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Невалидный id ');
       }
       next(err);
     })
@@ -36,13 +36,13 @@ module.exports.getUserId = (req, res, next) => {
 // контроллер для создания нового пользоватля, в тело передаются два параметра
 module.exports.createUser = (req, res, next) => {
   const {
-    email, password
+    email, password,
   } = req.body;
 
   bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
-      email, password: hash
+      email, password: hash,
     }))
     .then((user) => {
       res.send({
@@ -56,10 +56,10 @@ module.exports.createUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Переданы некорректные данные");
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
       } else {
-        throw new ConflictError("Пользователь с данным email уже существует!");
+        throw new ConflictError('Пользователь с данным email уже существует!');
       }
     })
     .catch(next);
@@ -74,9 +74,9 @@ module.exports.updateUser = (req, res, next) => {
       new: true,
       runValidators: true,
       // обработчик then получит на вход обновлённую запись/проверка ошибки валидации
-    }
+    },
   )
-    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
+    .orFail(new NotFoundError('Пользователь по заданному id отсутствует в базе'))
     .then((user) => {
       res.send({
         data: {
@@ -88,8 +88,8 @@ module.exports.updateUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Переданы некорректные данные");
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
       }
       next(err);
     })
@@ -104,9 +104,9 @@ module.exports.updateAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
-    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
+    .orFail(new NotFoundError('Пользователь по заданному id отсутствует в базе'))
     .then((user) => {
       res.send({
         data: {
@@ -118,8 +118,8 @@ module.exports.updateAvatar = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        throw new BadRequestError("Переданы некорректные данные");
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
       }
       next(err);
     })
@@ -132,7 +132,7 @@ module.exports.login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
-      const token = jwt.sign({ _id: user._id }, "some-secret-key", { expiresIn: "7d" });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
 
       // вернём токен
       res.send({ token });
@@ -146,7 +146,7 @@ module.exports.login = (req, res) => {
 // контроллер для получения данных о текущем пользователе
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(new NotFoundError("Пользователь по заданному id отсутствует в базе"))
+    .orFail(new NotFoundError('Пользователь по заданному id отсутствует в базе'))
     .then((user) => {
       res.send({
         data: {
@@ -159,8 +159,8 @@ module.exports.getCurrentUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        throw new BadRequestError("Невалидный id");
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Невалидный id');
       }
       next(err);
     })
