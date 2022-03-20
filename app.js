@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const { errors } = require("celebrate");
+const { celebrate, Joi } = require("celebrate");
 const auth = require("./middlewares/auth");
 const userRouter = require("./routes/users");
 const cardsRouter = require("./routes/cards");
@@ -16,9 +17,19 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(express.json());
-app.post("/signup", createUser);
+app.post("/signup", celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 
-app.post("/signin", login);
+app.post("/signin", celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
 
 app.use(auth);
 app.use(bodyParser.json());
