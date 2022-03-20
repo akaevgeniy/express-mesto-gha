@@ -16,8 +16,8 @@ cardsRouter.delete("/cards/:cardId", deleteCard);
 cardsRouter.post("/cards", celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required(),
-  }).unknown(true),
+    link: Joi.string().required().pattern(/(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/),
+  }),
 }), createCard);
 
 cardsRouter.delete("/cards/:cardId/likes", dislikeCard);
