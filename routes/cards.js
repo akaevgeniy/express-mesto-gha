@@ -11,7 +11,11 @@ const {
 
 cardsRouter.get("/cards", getCards);
 
-cardsRouter.delete("/cards/:cardId", deleteCard);
+cardsRouter.delete("/cards/:cardId", celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().required().length(24).hex(),
+  }),
+}), deleteCard);
 // валидируем приходящие на сервер данные
 // Если тело запроса не пройдёт валидацию, контроллеры не запустятся
 cardsRouter.post("/cards", celebrate({
@@ -21,8 +25,16 @@ cardsRouter.post("/cards", celebrate({
   }),
 }), createCard);
 
-cardsRouter.delete("/cards/:cardId/likes", dislikeCard);
+cardsRouter.delete("/cards/:cardId/likes", celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().required().length(24).hex(),
+  }),
+}), dislikeCard);
 
-cardsRouter.put("/cards/:cardId/likes", likeCard);
+cardsRouter.put("/cards/:cardId/likes", celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().required().length(24).hex(),
+  }),
+}), likeCard);
 
 module.exports = cardsRouter;

@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
       validator(v) {
         return /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(v);
       },
-      message: (props) => `${props.value} is not a valid phone number!`
+      message: (props) => `${props.value} is not a valid url!`
     }
   },
   email: {
@@ -37,7 +37,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
     select: false,
   },
 });
