@@ -1,4 +1,5 @@
 const userRouter = require("express").Router();
+const { celebrate, Joi } = require("celebrate");
 // импортируем контроллеры и добавляем их в качестве колбэков в методы роутов пользователя
 const {
   getUsers,
@@ -14,8 +15,17 @@ userRouter.get("/users/me", getCurrentUser);
 
 userRouter.get("/users/:userId", getUserId);
 
-userRouter.patch("/users/me", updateUser);
+userRouter.patch("/users/me", celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }),
+}), updateUser);
 
-userRouter.patch("/users/me/avatar", updateAvatar);
+userRouter.patch("/users/me/avatar", celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(/(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/),
+  }),
+}), updateAvatar);
 
 module.exports = userRouter;
