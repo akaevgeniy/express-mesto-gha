@@ -33,7 +33,7 @@ module.exports.getUserId = (req, res, next) => {
     })
     .catch(next);
 };
-// контроллер для создания нового пользоватля, в тело передаются три параметра
+// контроллер для создания нового пользоватля, в тело передаются два параметра
 module.exports.createUser = (req, res, next) => {
   const {
     email, password
@@ -127,7 +127,7 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch(next);
 };
-
+// авторизация, пользуемся методом из схемы
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 

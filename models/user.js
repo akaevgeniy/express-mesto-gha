@@ -2,8 +2,8 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const Unauthorized = require("../errors/unauth");
-// схема пользователя, состоит из трех обязательных полей
-// /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+// схема пользователя, состоит из двух обязательных полей, остальные
+// поля будут иметь дефолтное значение после создания
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
-
+// метод мангуста для авторизации пользователя
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select("+password")

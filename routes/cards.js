@@ -12,7 +12,8 @@ const {
 cardsRouter.get("/cards", getCards);
 
 cardsRouter.delete("/cards/:cardId", deleteCard);
-
+// валидируем приходящие на сервер данные
+// Если тело запроса не пройдёт валидацию, контроллеры не запустятся
 cardsRouter.post("/cards", celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),

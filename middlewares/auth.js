@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Unauthorized = require("../errors/unauth");
-
+// миддлвэр для авторизщации, задается для всех поступающих запросов
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith("Bearer ")) {
