@@ -12,12 +12,16 @@ const {
   login,
 } = require('./controllers/users');
 const NotFoundError = require('./errors/not-found-err');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(express.json());
+
+app.use(requestLogger); // подключаем логгер запросов
+
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -47,6 +51,9 @@ app.use(cardsRouter);
 app.use(() => {
   throw new NotFoundError('Ошибка 404 - Неправильный путь');
 });
+
+app.use(errorLogger); // подключаем логгер ошибок
+
 app.use(errors());
 app.use(errorsMiddleware);
 // запуск сервера, слушаем порт
